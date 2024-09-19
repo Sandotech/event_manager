@@ -26,5 +26,10 @@
       <td><%= "#{legislators}" %></td>
     <% end %>
   </table>
+  <% unless phone_number.nil? %>
+    <p>
+      You'll be receiving any updates to your phone number
+    <p>
+  <% end %>
 </body>
 </html>

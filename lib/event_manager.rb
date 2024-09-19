@@ -24,6 +24,16 @@ def legislators_by_zipcode(zip)
   end
 end
 
+def clean_phone_number(number)
+  valid_number = number.gsub(/[+-.()\s]/, '')
+
+  return nil if valid_number.size < 10 or valid_number.size > 11 or valid_number.size == 11 and valid_number[0] != '1'
+
+  return true if valid_number.length == 11 and valid_number[0].eql? '1'
+  
+  true if valid_number.length == 10
+end
+
 def save_thank_you_letter(id,form_letter)
   Dir.mkdir('output') unless Dir.exist?('output')
 
@@ -50,6 +60,7 @@ contents.each do |row|
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   legislators = legislators_by_zipcode(zipcode)
+  phone_number = clean_phone_number(row[:homephone])
 
   form_letter = erb_template.result(binding)
 
