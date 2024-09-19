@@ -1,3 +1,6 @@
 secret.key
 
 Gemfile.lock
+
+/output
+/output/*.erb
