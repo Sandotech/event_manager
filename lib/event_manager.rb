@@ -1,6 +1,12 @@
 require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
+require 'time'
+require_relative 'most_common_hour'
+
+include MostCommonHours
+
+HOURS = MostCommonHours
 
 civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
 civic_info.key = File.read('secret.key').strip
@@ -44,6 +50,21 @@ def save_thank_you_letter(id,form_letter)
   end
 end
 
+def better_hours_to_ads
+  max_hours = HOURS.most_common_hours
+
+  HOURS.display_hours(max_hours)
+end
+
+def give_time_format(date)
+  registration_date = date.split[0].split('/').map(&:to_i)
+  registration_hour = date.split[1].split(':').map(&:to_i)
+
+  date = Time.new registration_date[2], registration_date[0], registration_date[1], registration_hour[0], registration_hour[1]
+
+  HOURS << date.hour
+end
+
 puts 'EventManager initialized.'
 
 contents = CSV.open(
@@ -64,5 +85,9 @@ contents.each do |row|
 
   form_letter = erb_template.result(binding)
 
+  give_time_format(row[:regdate])
+
   save_thank_you_letter(id,form_letter)
 end
+
+better_hours_to_ads
