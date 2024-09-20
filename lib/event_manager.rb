@@ -2,11 +2,12 @@ require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
 require 'time'
-require_relative 'most_common_hour'
+require_relative 'most_common_time'
 
-include MostCommonHours
+include MostCommonTime
 
-HOURS = MostCommonHours
+HOURS = MostCommonTime
+DAYS = MostCommonTime
 
 civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
 civic_info.key = File.read('secret.key').strip
@@ -16,9 +17,6 @@ def clean_zipcode(zipcode)
 end
 
 def legislators_by_zipcode(zip)
-  civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
-  civic_info.key = 'AIzaSyClRzDqDh5MsXwnCWi0kOiiBivP6JsSyBw'
-
   begin
     civic_info.representative_info_by_address(
       address: zip,
@@ -51,7 +49,7 @@ def save_thank_you_letter(id,form_letter)
 end
 
 def better_hours_to_ads
-  max_hours = HOURS.most_common_hours
+  max_hours = HOURS.most_common
 
   HOURS.display_hours(max_hours)
 end
@@ -60,9 +58,13 @@ def give_time_format(date)
   registration_date = date.split[0].split('/').map(&:to_i)
   registration_hour = date.split[1].split(':').map(&:to_i)
 
-  date = Time.new registration_date[2], registration_date[0], registration_date[1], registration_hour[0], registration_hour[1]
+  Time.new registration_date[2], registration_date[0], registration_date[1], registration_hour[0], registration_hour[1]
+end
 
-  HOURS << date.hour
+def most_registered_hours(date)
+  time = give_time_format(date)
+
+  HOURS << time.hour
 end
 
 puts 'EventManager initialized.'
@@ -85,7 +87,7 @@ contents.each do |row|
 
   form_letter = erb_template.result(binding)
 
-  give_time_format(row[:regdate])
+  most_registered_hours(row[:regdate])
 
   save_thank_you_letter(id,form_letter)
 end
