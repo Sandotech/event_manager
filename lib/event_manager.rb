@@ -46,7 +46,7 @@ def save_thank_you_letter(id,form_letter)
   end
 end
 
-def better_hours_to_ads
+def advise_hours
   max_hours = HOURS.most_common
 
   HOURS.display_hours(max_hours)
@@ -59,16 +59,32 @@ def give_time_format(date)
   Time.new registration_date[2], registration_date[0], registration_date[1], registration_hour[0], registration_hour[1]
 end
 
-def most_registered_hours(date)
-  time = give_time_format(date)
-
+def save_hour(time)
   HOURS << time.hour
 end
 
-def most_registered_days(date)
+def save_day(time)
+  DAYS << time.wday
+end
+
+def save_time(date)
   time = give_time_format(date)
 
-  DAYS << time.wday
+  save_hour(time)
+
+  save_day(time)
+end
+
+def advise_days
+  most_common_days = DAYS.most_common
+  
+  DAYS.display_days(most_common_days)
+end
+
+def advise_to_boss
+  advise_hours
+
+  advise_days
 end
 
 puts 'EventManager initialized.'
@@ -91,13 +107,9 @@ contents.each do |row|
 
   form_letter = erb_template.result(binding)
 
-  most_registered_hours(row[:regdate])
-
-  most_registered_days(row[:regdate])
+  save_time(row[:regdate])
 
   save_thank_you_letter(id,form_letter)
 end
 
-better_hours_to_ads
-most_common_days = DAYS.most_common
-DAYS.display_days(most_common_days)
+advise_to_boss
