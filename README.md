@@ -7,7 +7,7 @@ This Ruby project provides a comprehensive event management solution, including:
 - **Registration Data Processing:** Reads attendee data from a CSV file (`event_attendees.csv`).
 - **Legislator Lookup:** Retrieves legislators for a given ZIP code using the Google Civic Information API (requires a valid API key).
 - **Thank-You Letter Generation:** Creates personalized thank-you letters for each attendee using an ERB template (`form_letter.erb`).
-- **Time Analysis:** Analyzes registration times to identify the most common hours for registrations.
+- **Time Analysis:** Analyzes registration times to identify the most common hours and days of the week for registrations.
 
 ## Getting Started:
 
