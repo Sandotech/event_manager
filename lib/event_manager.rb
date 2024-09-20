@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'csv'
 require 'google/apis/civicinfo_v2'
 require 'erb'
@@ -15,28 +17,34 @@ def clean_zipcode(zipcode)
 end
 
 def legislators_by_zipcode(zip)
-  begin
-    civic_info.representative_info_by_address(
-      address: zip,
-      levels: 'country',
-      roles: ['legislatorUpperBody', 'legislatorLowerBody']
-    ).officials
-  rescue
-    'You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials'
-  end
+  civic_info.representative_info_by_address(
+    address: zip,
+    levels: 'country',
+    roles: %w[legislatorUpperBody legislatorLowerBody]
+  ).officials
+rescue StandardError
+  'You can find your representatives by visiting www.commoncause.org/take-action/find-elected-officials'
+end
+
+def phone_in_range?(phone_number)
+  phone_number.size == 11 || phone_number.size > 11
+end
+
+def invalid_phone_number?(phone_number)
+  phone_number.size == 11 && phone_number[0] != '1'
 end
 
 def clean_phone_number(number)
-  valid_number = number.gsub(/[+-.()\s]/, '')
+  phone_number = number.gsub(/[+-.()\s]/, '')
 
-  return nil if valid_number.size < 10 or valid_number.size > 11 or valid_number.size == 11 and valid_number[0] != '1'
+  return nil if phone_in_range?(phone_number) || invalid_phone_number?(phone_number)
 
-  return true if valid_number.length == 11 and valid_number[0].eql? '1'
-  
-  true if valid_number.length == 10
+  return true if (phone_number.length == 11) && phone_number[0].eql?('1')
+
+  true if phone_number.length == 10
 end
 
-def save_thank_you_letter(id,form_letter)
+def save_thank_you_letter(id, form_letter)
   Dir.mkdir('output') unless Dir.exist?('output')
 
   filename = "output/thanks_#{id}.html"
@@ -77,7 +85,7 @@ end
 
 def advise_days
   most_common_days = DAYS.most_common
-  
+
   DAYS.display_days(most_common_days)
 end
 
@@ -109,7 +117,7 @@ contents.each do |row|
 
   save_time(row[:regdate])
 
-  save_thank_you_letter(id,form_letter)
+  save_thank_you_letter(id, form_letter)
 end
 
 advise_to_boss

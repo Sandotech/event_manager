@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
+# This class identifies the most common registration times and days.#
 class MostCommonTime
-  DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-  
+  DAYS = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday].freeze
+
   def initialize
     @time = []
   end
@@ -10,7 +13,7 @@ class MostCommonTime
   end
 
   def count_time
-    count_of_time = @time.each_with_object (Hash.new(0)) { |time, hours| hours[time] += 1 }
+    count_of_time = @time.each_with_object(Hash.new(0)) { |time, hours| hours[time] += 1 }
 
     count_of_time.max_by(3) { |_, count| count }
   end
@@ -22,7 +25,7 @@ class MostCommonTime
   def most_common
     max_hours = count_time
 
-    max_hours.map.with_index {|v| v[0]}
+    max_hours.map { |v| v[0] }
   end
 
   def display_hours(hours)
