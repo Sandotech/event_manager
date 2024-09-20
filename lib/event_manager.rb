@@ -4,10 +4,8 @@ require 'erb'
 require 'time'
 require_relative 'most_common_time'
 
-include MostCommonTime
-
-HOURS = MostCommonTime
-DAYS = MostCommonTime
+HOURS = MostCommonTime.new
+DAYS = MostCommonTime.new
 
 civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
 civic_info.key = File.read('secret.key').strip
@@ -67,6 +65,12 @@ def most_registered_hours(date)
   HOURS << time.hour
 end
 
+def most_registered_days(date)
+  time = give_time_format(date)
+
+  DAYS << time.wday
+end
+
 puts 'EventManager initialized.'
 
 contents = CSV.open(
@@ -89,7 +93,11 @@ contents.each do |row|
 
   most_registered_hours(row[:regdate])
 
+  most_registered_days(row[:regdate])
+
   save_thank_you_letter(id,form_letter)
 end
 
 better_hours_to_ads
+most_common_days = DAYS.most_common
+DAYS.display_days(most_common_days)
